@@ -149,6 +149,7 @@ def compile_math(latex: str, builder: Builder) -> Path:
     command.append('math.tex')
 
     try:
+        logger.warning(f"LATEX: cmd={command} cwd={tempdir}")
         subprocess.run(
             command, capture_output=True, cwd=tempdir, check=True, encoding='ascii'
         )
@@ -157,7 +158,7 @@ def compile_math(latex: str, builder: Builder) -> Path:
         else:
             return tempdir / 'math.dvi'
     except OSError as exc:
-        logger.warning(
+        logger.critical(
             __(
                 'LaTeX command %r cannot be run (needed for math '
                 'display), check the imgmath_latex setting'
@@ -173,6 +174,7 @@ def compile_math(latex: str, builder: Builder) -> Path:
 def convert_dvi_to_image(command: list[str], name: str) -> tuple[str, str]:
     """Convert DVI file to specific image format."""
     try:
+        logger.warning(f"DVI: cmd={command}")
         ret = subprocess.run(command, capture_output=True, check=True, encoding='ascii')
         return ret.stdout, ret.stderr
     except OSError as exc:
@@ -317,13 +319,15 @@ def clean_up_files(app: Sphinx, exc: Exception) -> None:
 
     if hasattr(app.builder, '_imgmath_tempdir'):
         with contextlib.suppress(Exception):
-            shutil.rmtree(app.builder._imgmath_tempdir)
+            #shutil.rmtree(app.builder._imgmath_tempdir)
+            pass
 
     if app.builder.config.imgmath_embed:
         # in embed mode, the images are still generated in the math output dir
         # to be shared across workers, but are not useful to the final document
         with contextlib.suppress(Exception):
-            shutil.rmtree(app.builder.outdir / app.builder.imagedir / 'math')
+            #shutil.rmtree(app.builder.outdir / app.builder.imagedir / 'math')
+            pass
 
 
 def get_tooltip(self: HTML5Translator, node: Element) -> str:
